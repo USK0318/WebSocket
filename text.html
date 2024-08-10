@@ -1,0 +1,84 @@
+<!-- table.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client - Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Data Table</h1>
+
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data will be dynamically added here -->
+    </tbody>
+</table>
+
+<script>
+    const ws = new WebSocket('ws://localhost:8080');
+    const tableBody = document.querySelector('#dataTable tbody');
+
+    ws.onopen = () => {
+        console.log('Connected to the WebSocket server');
+    };
+
+    ws.onmessage = (event) => {
+        const newData = JSON.parse(event.data);
+        addTableRow(newData.name, newData.value);
+    };
+
+    ws.onclose = () => {
+        console.log('Disconnected from the WebSocket server');
+    };
+
+    ws.onerror = (error) => {
+        console.error(`WebSocket error: ${error}`);
+    };
+
+    // Function to add a row to the table
+    function addTableRow(name, value) {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        const valueCell = document.createElement('td');
+        nameCell.textContent = name;
+        valueCell.textContent = value;
+        row.appendChild(nameCell);
+        row.appendChild(valueCell);
+        tableBody.appendChild(row);
+    }
+
+    // Fetch initial data to populate the table
+    fetch('http://localhost:8080/api/datag')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(item => addTableRow(item.name, item.value));
+        });
+</script>
+
+</body>
+</html>
