@@ -34,6 +34,12 @@ app.post('/api/data', (req, res) => {
   res.status(201).json(newData);
 });
 
+app.get('/len', (req, res) => {
+  const len = data.length;
+   let data1 = { 'lenght':len }
+  res.status(200).json(data1);
+});
+
 const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

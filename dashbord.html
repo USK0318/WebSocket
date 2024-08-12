@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .dashboard {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .dashboard .length-info {
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Dashboard</h1>
+        <div class="length-info">
+            Length of Data: <span id="dataLength"></span>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket setup
+        const ws = new WebSocket('ws://localhost:8080');
+        const dataLengthSpan = document.getElementById('dataLength');
+        let x=0
+
+        ws.onopen = () => {
+            console.log('Connected to the WebSocket server');
+        };
+
+        ws.onmessage = (event) => {
+            const newData = JSON.parse(event.data);
+            x=x+1
+            updateDataLength(x);
+        };
+
+        ws.onclose = () => {
+            console.log('Disconnected from the WebSocket server');
+        };
+
+        ws.onerror = (error) => {
+            console.error(`WebSocket error: ${error}`);
+        };
+
+        // Function to update the data length in the dashboard
+        function updateDataLength(length) {
+            dataLengthSpan.textContent = x;
+        }
+
+        // Fetch the initial data length when the page loads
+        function fetchDataLength() {
+            fetch('http://localhost:8080/len')
+                .then(response => response.json())
+                .then(data => {
+                    x=x+data.lenght
+                    updateDataLength(x); // Make sure this matches the API response key
+                })
+                .catch(error => {
+                    console.error('Error fetching data length:', error);
+                    dataLengthSpan.textContent = 'Error';
+                });
+        }
+
+        // Call the function when the page loads
+        window.onload = fetchDataLength;
+    </script>
+</body>
+</html>
