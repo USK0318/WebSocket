@@ -17,6 +17,10 @@ app.use(cors());  // Enable CORS for all routes
 app.use(express.static(path.join(__dirname, 'public')));
 
 // GET API to retrieve the data
+app.get('/',(req ,res) =>{
+  res.send('hello Saikiran')
+})
+
 app.get('/api/datag', (req, res) => {
   res.json(data);
 });
